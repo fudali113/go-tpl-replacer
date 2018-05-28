@@ -30,12 +30,15 @@ func main() {
 	if argFiles != "" {
 		loadArgsByFile(argsMap, argFiles)
 	}
-	loadArgs(argsMap, args)
+	if args != "" {
+		loadArgs(argsMap, args)
+	}
 	replaces := replace.Templates()
 	for i := range replaces {
 		err = replaces[i].Execute(os.Stdout, argsMap)
 		if err != nil {
 			log.Printf("替換配置參數出錯, name: %s ; error: %s", replaces[i].Name(), err.Error())
+			os.Exit(1)
 		} else {
 			io.Copy(os.Stdout, bytes.NewBufferString(fmt.Sprintf(" \n\n%s\n\n", outSplitStr)))
 		}
@@ -60,7 +63,7 @@ func loadArgsByFile(context map[string]interface{}, argFiles string) {
 			f, err := os.Open(filePath)
 			if err != nil {
 				log.Printf("打開文件 %s 出錯, err: %s ", filePath, err.Error())
-				return
+				os.Exit(1)
 			}
 			defer f.Close()
 			rd := bufio.NewReader(f)
@@ -80,6 +83,7 @@ func loadKvString(context map[string]interface{}, kvString string)  {
 	kv := strings.SplitN(kvString, "=", 2)
 	if len(kv) != 2 {
 		log.Printf("參數 %s 不能被正確解析", kvString)
+		os.Exit(1)
 	} else {
 		context[kv[0]] = kv[1]
 	}
