@@ -40,7 +40,7 @@ func main() {
 			log.Printf("替換配置參數出錯, name: %s ; error: %s", replaces[i].Name(), err.Error())
 			os.Exit(1)
 		} else {
-			io.Copy(os.Stdout, bytes.NewBufferString(fmt.Sprintf(" \n\n%s\n\n", outSplitStr)))
+			io.Copy(os.Stdout, bytes.NewBufferString(fmt.Sprintf(" \n%s\n", outSplitStr)))
 		}
 	}
 	os.Exit(0)
