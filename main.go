@@ -51,6 +51,9 @@ func main() {
 func loadArgs(context map[string]interface{}, argsStr string) {
 	args := strings.Split(argsStr, ";")
 	for _, arg := range args {
+		if arg == "" {
+			continue
+		}
 		loadKvString(context, arg)
 	}
 }
@@ -69,10 +72,19 @@ func loadArgsByFile(context map[string]interface{}, argFiles string) {
 			rd := bufio.NewReader(f)
 			for  {
 				line, err := rd.ReadString('\n')
-				loadKvString(context, line)
-				if err != nil {
+				line = strings.TrimSpace(line)
+				// 支持空格换行和 以 # 注释
+				if line == "" || strings.HasPrefix(line, "#") {
+					if io.EOF == err {
+						break
+					}
+					continue
+				}
+				if err != nil && line == "" {
+					log.Printf(err.Error())
 					break
 				}
+				loadKvString(context, line)
 			}
 		}()
 	}
