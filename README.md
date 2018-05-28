@@ -6,11 +6,11 @@
 
 such as:
 ```
-./go-tpl-replacer -tpl-files config1.tpl -arg-files args.properties -out-split --- -args name=test name
+./go-tpl-replacer -tpl-files config1.tpl -arg-files args.properties -out-split --- -args name="test name"
 
 out:
 hello:
-    name: test
+    name: test name
     value: i am value
 
 ---
