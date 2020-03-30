@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -9,29 +10,35 @@ import (
 	"log"
 	"os"
 	"strings"
-	"bufio"
 )
 
 func main() {
 
-	var tplFiles, args, argFiles, outSplitStr string
+	var tplFiles, args, argFiles, outSplitStr, getArgValue string
 	flag.StringVar(&tplFiles, "tpl-files", "config.tpl", "需要替換的模板文件; 多個文件使用 `;` 分割")
 	flag.StringVar(&outSplitStr, "out-split", "---", "多個輸出的分割")
 	flag.StringVar(&args, "args", "", "參數集合； 參數使用=分割, k=v ; 多個參數使用 `;` 分割")
 	flag.StringVar(&argFiles, "arg-files", "", "參數文件集合, 多個文件使用 `;` 分割； 目前只支持 properties 文件格式")
+	flag.StringVar(&getArgValue, "get-arg-value", "", "获取某个参数的值")
 	flag.Parse()
 
-	replace, err := template.ParseFiles(strings.Split(tplFiles, ";")...)
-	if err != nil {
-		log.Printf("加載 tpl 文件出錯, error: %s", err.Error())
-		os.Exit(1)
-	}
 	argsMap := map[string]interface{}{}
 	if argFiles != "" {
 		loadArgsByFile(argsMap, argFiles)
 	}
 	if args != "" {
 		loadArgs(argsMap, args)
+	}
+
+	if getArgValue != "" {
+		fmt.Printf("%s", argsMap[getArgValue])
+		return
+	}
+
+	replace, err := template.ParseFiles(strings.Split(tplFiles, ";")...)
+	if err != nil {
+		log.Printf("加載 tpl 文件出錯, error: %s", err.Error())
+		os.Exit(1)
 	}
 	replaces := replace.Templates()
 	for i := range replaces {
